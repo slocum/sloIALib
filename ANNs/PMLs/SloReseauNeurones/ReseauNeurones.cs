@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 /// <summary>
 /// Cours : http://alp.developpez.com/tutoriels/intelligence-artificielle/reseaux-de-neurones/
@@ -85,17 +86,19 @@ namespace SloIALib.ANNs.PMLs.SloReseauNeurones
             // MAB des sorties des couches du réseau
             MabSorties();
 
-            // Calcul des sorties
+            // Calcul les sorties par rapport aux valeurs d'entrée du réseau
             double[] lstValeursEntrees = pLstValeursEntrees;
 
+            // On parcourt toutes les couches de l'entrée vers la sortie
             for (int i = 0; i < _NbreCouches; i++)
             {
+                // les valeurs d'entrées correspondent aux valeurs de sorties des neurones de la couche précédente.
                 _LstCouches[i].CalculerSorties(lstValeursEntrees);
                 lstValeursEntrees = _LstCouches[i].listerSorties();
             }
 
             // Retourne les valeurs des sorties du réseau
-            return ListerSortiesReseau();
+            return lstValeursEntrees; //ListerSortiesReseau();
 
         }
 
@@ -150,7 +153,7 @@ namespace SloIALib.ANNs.PMLs.SloReseauNeurones
                 }
                 else
                 {
-                    LireLignesCouches(ligne, coucheId);
+                    await LireLignesCouchesAsync(ligne, coucheId);
                     coucheId += 1;
                 }
             }
@@ -173,26 +176,20 @@ namespace SloIALib.ANNs.PMLs.SloReseauNeurones
 
             for (int i = 0; i < _NbreCouches; i++)
             {
+                // 1 neurone = 1 sortie - 1 neurone a autant d'entrées qu'il de sorties de neurones sur la couche précédente. 
+                // Donc Nbre d'entrées par neurone = nombre de neurones de la couche précédente. 
+                int nbreEntreesParNeurone = 0;
                 if (i==0)       // Première couche
                 { 
-                    _LstCouches[i] = new Couche(i, pLstLongueursCouches[i], _NbreEntrees, pFonctionTransfert);
+                    nbreEntreesParNeurone = _NbreEntrees;
                 }
                 else          // Couches suivantes
                 {
-                    _LstCouches[i] = new Couche(i, pLstLongueursCouches[i], pLstLongueursCouches[i-1], pFonctionTransfert);
+                    nbreEntreesParNeurone = pLstLongueursCouches[i - 1];
                 }
-            }
-        }
 
-        /// <summary>
-        /// Récupère les sorties du réseau
-        /// </summary>
-        /// <returns>Valeurs des sorties du réseau</returns>
-        /// <remarks>Créée le 21/07/2016 par : JF Enond</remarks>
-        private double[] ListerSortiesReseau()
-        {
-            // Sorties de la dernière couche
-            return _LstCouches[_NbreCouches - 1].listerSorties();
+                _LstCouches[i] = new Couche(i, pLstLongueursCouches[i], nbreEntreesParNeurone, pFonctionTransfert);
+            }
         }
 
         /// <summary>
@@ -207,6 +204,16 @@ namespace SloIALib.ANNs.PMLs.SloReseauNeurones
             }
         }
 
+        ///// <summary>
+        ///// Récupère les sorties du réseau
+        ///// </summary>
+        ///// <returns>Valeurs des sorties du réseau</returns>
+        ///// <remarks>Créée le 21/07/2016 par : JF Enond</remarks>
+        //private double[] ListerSortiesReseau()
+        //{
+        //    // Sorties de la dernière couche
+        //    return _LstCouches[_NbreCouches - 1].listerSorties();
+        //}
 
         #region Fichier de sauvegarde
 
@@ -280,7 +287,7 @@ namespace SloIALib.ANNs.PMLs.SloReseauNeurones
             InitLstCouches(_LstLongueursCouches, Functions.ActivationFunction.ObjetFonction(Type.GetType(lstChamps[2]))); 
         }
 
-        private void LireLignesCouches(String pLigne, int pCoucheId)
+        private async Task LireLignesCouchesAsync(String pLigne, int pCoucheId)
         {
             string[] lstNeurones = pLigne.Split(SEPARATEUR_CHAMP);
 
@@ -289,7 +296,7 @@ namespace SloIALib.ANNs.PMLs.SloReseauNeurones
                 string[] lstPoidsDuNeurone = lstNeurones[neurone.Id].Split(SEPARATEUR_ELEMENT);
                 for (int i = 0; i < lstPoidsDuNeurone.Length; i++)
                 {
-                    neurone.majPoids(i, double.Parse(lstPoidsDuNeurone[i]));
+                    neurone.MajPoids(i, double.Parse(lstPoidsDuNeurone[i]));
                 }
             }
         }

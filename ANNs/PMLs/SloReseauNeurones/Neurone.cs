@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -17,6 +18,9 @@ namespace SloIALib.ANNs.PMLs.SloReseauNeurones
         #endregion
 
         #region Variables
+
+        private Random _Hasard = new Random();
+
 
         #endregion
 
@@ -37,8 +41,8 @@ namespace SloIALib.ANNs.PMLs.SloReseauNeurones
         }
 
 
-        private double[] _LstPoids;
-        public double[] LstPoids
+        private List<double> _LstPoids;
+        public List<double> LstPoids
         {
             get { return _LstPoids; }
         }
@@ -68,9 +72,11 @@ namespace SloIALib.ANNs.PMLs.SloReseauNeurones
             _Id = pId;
 
             _NbreEntrees = pNbreEntrees;
-            _LstPoids = new double[_NbreEntrees + BIAIS];
-            initPoids();
+            _LstPoids = new List<double>(_NbreEntrees + BIAIS);
+            InitPoids();
+
             _FonctionTransfert = pFonctionTransfert;
+
             _Sortie = double.NaN;
             _DeltaErr = double.NaN;
 
@@ -81,7 +87,12 @@ namespace SloIALib.ANNs.PMLs.SloReseauNeurones
 
         #region Interface
 
-        public void calculerSortie(double[] pLstValEntrees)
+        /// <summary>
+        /// Calcul de la sortie d'un neurone
+        /// </summary>
+        /// <param name="pLstValEntrees"></param>
+        /// <remarks>Créée le 29/12/2016 par : JF Enond</remarks>
+        public void CalculerSortie(double[] pLstValEntrees)
         {
             double sumEntrees = 0;
 
@@ -90,6 +101,7 @@ namespace SloIALib.ANNs.PMLs.SloReseauNeurones
             {
                 sumEntrees += pLstValEntrees[i] * _LstPoids[i];
             }
+
             // Coefficient de biais
             sumEntrees -= _LstPoids[_iBiais];   // Hack : Valeur d'entrée du biais (seuil) = -1
 
@@ -97,15 +109,24 @@ namespace SloIALib.ANNs.PMLs.SloReseauNeurones
             _Sortie = _FonctionTransfert.Fonction(sumEntrees);
         }
 
-        public void mabSortie()
+        public void MabSortie()
         {
             _Sortie = double.NaN;
         }
 
-        public void majPoids(int pIndex, double pValeur)
+        public void MajPoids(int pIndex, double pValeur)
         {
-            _LstPoids[pIndex] = pValeur;
+
             DeltaErr = double.NaN;
+
+            //await System.Threading.Tasks.Task.Delay(100);
+            //Debug.WriteLine(pValeur);
+            if (_LstPoids.Count != _LstPoids.Capacity)
+            {
+                _LstPoids.Add(pValeur);
+            } else { 
+                _LstPoids[pIndex] = pValeur;
+            }
         }
 
         #endregion
@@ -115,14 +136,17 @@ namespace SloIALib.ANNs.PMLs.SloReseauNeurones
         /// <summary>
         ///  Initialise la liste des poids avec des valeurs comprises entre -1 et 1
         /// </summary>
-        private void initPoids()
+        private void InitPoids()
         {
-            //ThreadLocal.Sleep(100);
-            Random hasard = new Random();
-
-            for (int i = 0; i < _LstPoids.Length; i++)
+            for (int i = 0; i < _LstPoids.Capacity; i++)
             {
-                _LstPoids[i] = hasard.NextDouble() * 2 - 1;
+
+                double poids = _Hasard.NextDouble() * 2 - 1;
+                Task.Delay(5);
+
+                Debug.WriteLine(poids);
+
+                MajPoids(i, poids);
             }
         }
 

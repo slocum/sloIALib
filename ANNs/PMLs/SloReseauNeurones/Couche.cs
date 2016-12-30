@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -36,7 +37,8 @@ namespace SloIALib.ANNs.PMLs.SloReseauNeurones
             _Num = pNum;
             _NbreNeurones = pNbreNeurones;
             _NbreEntreesParNeurone = pNbreSortiesCouchePrecedente;
-            initLstNeurones(pFonctionTransfert);
+
+            InitLstNeurones(pFonctionTransfert);
         }
 
         #endregion
@@ -47,18 +49,27 @@ namespace SloIALib.ANNs.PMLs.SloReseauNeurones
         {
             for (int i = 0; i < _LstNeurones.Length; i++)
             {
-                _LstNeurones[i].mabSortie();
+                _LstNeurones[i].MabSortie();
             }
         }
 
+        /// <summary>
+        /// Calcul des sorties des neurones de la couche
+        /// </summary>
+        /// <param name="pLstValEntrees"></param>
+        /// <remarks>Créée le 29/12/2016 par : JF Enond</remarks>
         public void CalculerSorties(double[] pLstValEntrees)
         {
             for (int i = 0; i < _LstNeurones.Length; i++)
             {
-                _LstNeurones[i].calculerSortie(pLstValEntrees);
+                _LstNeurones[i].CalculerSortie(pLstValEntrees);
             }
         }
 
+        /// <summary>
+        /// Récupère les sorties de tous les neurones de la couche
+        /// </summary>
+        /// <returns></returns>
         public double[] listerSorties()
         {
             double[] lstSorties = new double[_LstNeurones.Length];
@@ -66,6 +77,7 @@ namespace SloIALib.ANNs.PMLs.SloReseauNeurones
             for (int i = 0; i < _LstNeurones.Length; i++)
             {
                 lstSorties[i] = _LstNeurones[i].Sortie;
+                //Debug.WriteLine("Couche : " + _Num.ToString() + " Sortie : " + i.ToString() + "  "  + lstSorties[i].ToString());
             }
 
             return lstSorties;
@@ -75,8 +87,14 @@ namespace SloIALib.ANNs.PMLs.SloReseauNeurones
 
         #region Implémentation
 
-        private void initLstNeurones(Functions.ActivationFunction pFonctionTransfert)
+        /// <summary>
+        /// Initialisation des neurones de la couche
+        /// </summary>
+        /// <param name="pFonctionTransfert"></param>
+        /// <remarks>Créée le29/12/2016 par : JF Enond </remarks>
+        private void InitLstNeurones(Functions.ActivationFunction pFonctionTransfert)
         {
+            // Liste des neurones de la couche
             _LstNeurones = new Neurone[_NbreNeurones];
 
             for (int i = 0; i < _LstNeurones.Length; i++)

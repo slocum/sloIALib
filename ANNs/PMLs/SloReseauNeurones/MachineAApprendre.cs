@@ -70,11 +70,11 @@ namespace SloIALib.ANNs.PMLs.SloReseauNeurones
 
             //Répéter
             int iteration = 0;
-            while(iteration<=_NbreIterations)   // TODO : ajouter un critère 
+            while (iteration <= _NbreIterations)   // TODO : ajouter un critère 
             {
                 // Calcul des Deltas des neurones de la couche de sorties
 
-                int iCouche = _Reseau.LstCouches.Length;
+                int iCouche = _Reseau.LstCouches.Length - 1;
                 for (int i = 0; i < _Reseau.LstCouches[iCouche].LstNeurones.Length; i++)
                 {
                     //   DeltaErr <- si(1 - si)(yi - si) 
@@ -85,16 +85,16 @@ namespace SloIALib.ANNs.PMLs.SloReseauNeurones
 
                 // Parcours des couches cachées de l'avant-dernière à la première
                 iCouche = _Reseau.LstCouches.Length - 1;
-                for(int i = iCouche; i >= 0; i--)
+                for (int i = iCouche; i >= 0; i--)
                 {
                     // Parcours des neurones de la couche courante
-                    foreach(Neurone neurone in _Reseau.LstCouches[i].LstNeurones)
+                    foreach (Neurone neurone in _Reseau.LstCouches[i].LstNeurones)
                     {
                         // o = sortie du neurone
                         // Somme [ poids des neuronnes de la couche suivante * delta ]       //Somme[pour k appartenant aux indices des neurones prenant en entrée la sortie du neurone i] de dk * w_ki
                         double sommePoidsK = 0;
                         // Parcours de la liste suivante des neurones
-                        for (int j=0; j < _Reseau.LstCouches[iCouche+1].LstNeurones.Length; j++)
+                        for (int j = 0; j < _Reseau.LstCouches[iCouche + 1].LstNeurones.Length; j++)
                         {
                             sommePoidsK += _Reseau.LstCouches[iCouche + 1].LstNeurones[j].LstPoids[neurone.Id] * _Reseau.LstCouches[iCouche + 1].LstNeurones[j].DeltaErr;
                         }
@@ -106,7 +106,7 @@ namespace SloIALib.ANNs.PMLs.SloReseauNeurones
                 }
 
                 // MAJ de tous les poids
-                MajPoidsReseau(tauxApprentissage);
+                MajPoidsReseauAsync(tauxApprentissage);
 
                 tauxApprentissage = tauxApprentissage / 2;    //TODO : voir si meilleur évaluation du taux d'apprentissage
 
@@ -117,27 +117,26 @@ namespace SloIALib.ANNs.PMLs.SloReseauNeurones
             }
         }
 
-        private void MajPoidsReseau(double pTauxApprentissage)
+        private async void MajPoidsReseauAsync(double pTauxApprentissage)
         {
             // Pour tout poids w_ij < -w_ij + epsilon * di * x_ij finPour
             foreach (Couche couche in _Reseau.LstCouches)
             {
-                foreach(Neurone neurone in couche.LstNeurones)
+                foreach (Neurone neurone in couche.LstNeurones)
                 {
                     double newPoids = 0;
 
-                    for(int i = 0; i < neurone.LstPoids.Length - 1; i++)
+                    for (int i = 0; i < neurone.LstPoids.Count - 1; i++)
                     {
                         newPoids = neurone.LstPoids[i] + pTauxApprentissage * neurone.DeltaErr * neurone.Sortie;
-                        neurone.majPoids(i, newPoids);
+                        neurone.MajPoids(i, newPoids);
                     }
 
                     // maj du biais
                     newPoids = neurone.LstPoids[neurone.iBiais] + pTauxApprentissage * neurone.DeltaErr;
-                    neurone.majPoids(neurone.iBiais, newPoids);
+                    neurone.MajPoids(neurone.iBiais, newPoids);
                 }
             }
-
         }
 
         #endregion
