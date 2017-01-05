@@ -70,6 +70,8 @@ namespace SloIALib.ANNs.PMLs.Donnees
                 {
                     _LstSortieObservable[i].Correcte = false;
                 }
+
+                valueOld = pLstDouble[i];
             }
         }
 

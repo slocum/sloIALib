@@ -103,7 +103,7 @@ namespace SloIALib.ANNs.PMLs.SloReseauNeurones
             }
 
             // Coefficient de biais
-            sumEntrees -= _LstPoids[_iBiais];   // Hack : Valeur d'entrée du biais (seuil) = -1
+            sumEntrees += _LstPoids[_iBiais];   // Hack : Valeur d'entrée du biais (seuil) = +1
 
             //  Fonction de transfert
             _Sortie = _FonctionTransfert.Fonction(sumEntrees);
@@ -111,16 +111,14 @@ namespace SloIALib.ANNs.PMLs.SloReseauNeurones
 
         public void MabSortie()
         {
+            DeltaErr = double.NaN;
             _Sortie = double.NaN;
         }
 
         public void MajPoids(int pIndex, double pValeur)
         {
-
-            DeltaErr = double.NaN;
-
             //await System.Threading.Tasks.Task.Delay(100);
-            //Debug.WriteLine(pValeur);
+            Debug.WriteLine(pValeur);
             if (_LstPoids.Count != _LstPoids.Capacity)
             {
                 _LstPoids.Add(pValeur);
@@ -142,7 +140,7 @@ namespace SloIALib.ANNs.PMLs.SloReseauNeurones
             {
 
                 double poids = _Hasard.NextDouble() * 2 - 1;
-                Task.Delay(5);
+                //await Task.Delay(500);
 
                 Debug.WriteLine(poids);
 

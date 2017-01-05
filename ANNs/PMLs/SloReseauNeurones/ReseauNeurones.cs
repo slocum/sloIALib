@@ -98,7 +98,7 @@ namespace SloIALib.ANNs.PMLs.SloReseauNeurones
             }
 
             // Retourne les valeurs des sorties du réseau
-            return lstValeursEntrees; //ListerSortiesReseau();
+            return ListerSortiesReseau();
 
         }
 
@@ -204,16 +204,16 @@ namespace SloIALib.ANNs.PMLs.SloReseauNeurones
             }
         }
 
-        ///// <summary>
-        ///// Récupère les sorties du réseau
-        ///// </summary>
-        ///// <returns>Valeurs des sorties du réseau</returns>
-        ///// <remarks>Créée le 21/07/2016 par : JF Enond</remarks>
-        //private double[] ListerSortiesReseau()
-        //{
-        //    // Sorties de la dernière couche
-        //    return _LstCouches[_NbreCouches - 1].listerSorties();
-        //}
+        /// <summary>
+        /// Récupère les sorties du réseau
+        /// </summary>
+        /// <returns>Valeurs des sorties du réseau</returns>
+        /// <remarks>Créée le 21/07/2016 par : JF Enond</remarks>
+        private double[] ListerSortiesReseau()
+        {
+            // Sorties de la dernière couche
+            return _LstCouches[_NbreCouches - 1].listerSorties();
+        }
 
         #region Fichier de sauvegarde
 
